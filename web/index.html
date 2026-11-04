@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12th Man — your live fantasy co-pilot</title>
+<style>
+  :root {
+    --bg: #0a0f1c; --card: #121a2e; --card2: #18223a; --line: #24304d;
+    --text: #e8edf7; --muted: #8b97b3; --up: #22c55e; --down: #ef4444;
+    --accent: #fbbf24; --mum: #3b82f6; --blr: #f97316; --ai: #a78bfa;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  button { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--card2); color: var(--text); border-radius: 8px; padding: 7px 12px; }
+  button:hover { border-color: var(--muted); }
+  button.primary { background: var(--accent); color: #111; border-color: var(--accent); font-weight: 600; }
+  button.on { background: var(--ai); color: #111; border-color: var(--ai); }
+  header { display: flex; align-items: center; gap: 16px; padding: 12px 20px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .logo { font-weight: 800; font-size: 18px; letter-spacing: .3px; }
+  .logo span { color: var(--accent); }
+  .tag { color: var(--muted); font-size: 12px; }
+  .spacer { flex: 1; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); }
+  .badge.live { color: var(--up); border-color: var(--up); }
+  main { display: grid; grid-template-columns: 340px 1fr 380px; gap: 14px; padding: 14px 20px; max-width: 1500px; margin: 0 auto; }
+  @media (max-width: 1150px) { main { grid-template-columns: 1fr 1fr; } .col-feed { grid-column: 1 / -1; order: 3; } }
+  @media (max-width: 720px) { main { grid-template-columns: 1fr; padding: 10px 12px; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+  .card h3 { margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .score-row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; }
+  .score-row .t { font-weight: 700; }
+  .score-row .r { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .score-row.dim { opacity: .55; }
+  .sub { color: var(--muted); font-size: 12px; }
+  .controls { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .big { font-size: 34px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .delta.up { color: var(--up); } .delta.down { color: var(--down); }
+  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kpi { background: var(--card2); border-radius: 10px; padding: 10px; }
+  .kpi .l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+  svg.spark { width: 100%; height: 56px; display: block; margin-top: 8px; }
+  .pl { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .pl:last-child { border-bottom: 0; }
+  .pl .n { font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .pl .p { font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; }
+  .pl .s { font-size: 12px; color: var(--muted); grid-column: 1 / -1; }
+  .pl.flash { animation: flash 1s; }
+  @keyframes flash { from { background: rgba(251,191,36,.25); } to { background: transparent; } }
+  .chip { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; }
+  .chip.MUM { background: rgba(59,130,246,.2); color: #93c5fd; }
+  .chip.BLR { background: rgba(249,115,22,.2); color: #fdba74; }
+  .cv { font-size: 10px; font-weight: 800; background: var(--accent); color: #111; border-radius: 99px; padding: 1px 6px; }
+  .cv.vc { background: #e5e7eb; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--up); display: inline-block; }
+  .feed { max-height: calc(100vh - 140px); overflow-y: auto; }
+  .ev { padding: 9px 10px; border-radius: 8px; margin-bottom: 6px; background: var(--card2); border-left: 3px solid transparent; }
+  .ev .c { font-size: 13px; }
+  .ev .me { font-size: 13px; margin-top: 3px; }
+  .ev.minor { background: transparent; padding: 3px 10px; margin-bottom: 2px; }
+  .ev.minor .c { color: var(--muted); font-size: 12px; }
+  .ev.good { border-left-color: var(--up); }
+  .ev.bad { border-left-color: var(--down); }
+  .ev.info { border-left-color: var(--accent); }
+  .ev.ai { border-left-color: var(--ai); background: rgba(167,139,250,.08); }
+  .ev .why { margin-top: 6px; font-size: 11px; padding: 3px 8px; }
+  .ev .ai-text { margin-top: 6px; color: #ddd6fe; font-size: 13px; }
+  .lev { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .lev:last-child { border-bottom: 0; }
+  .lev b { font-variant-numeric: tabular-nums; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .chat { max-height: 330px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+  .msg { padding: 8px 11px; border-radius: 10px; font-size: 13px; white-space: pre-wrap; }
+  .msg.u { align-self: flex-end; background: var(--card2); max-width: 85%; }
+  .msg.a { background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.3); }
+  .msg .src { display: block; font-size: 10px; color: var(--muted); margin-top: 4px; }
+  .sugg { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .sugg button { font-size: 12px; padding: 4px 9px; border-radius: 99px; }
+  .ask { display: flex; gap: 6px; }
+  .ask input { flex: 1; background: var(--card2); border: 1px solid var(--line); color: var(--text); border-radius: 8px; padding: 8px 10px; font: inherit; }
+  .away-banner { background: rgba(167,139,250,.12); border: 1px dashed var(--ai); border-radius: 10px; padding: 12px; margin-bottom: 10px; text-align: center; }
+  /* pre-match */
+  .overlay { position: fixed; inset: 0; background: rgba(5,8,16,.92); display: flex; align-items: center; justify-content: center; z-index: 10; padding: 16px; }
+  .modal { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; width: min(620px, 100%); max-height: 92vh; overflow-y: auto; }
+  .modal h2 { margin: 0 0 4px; }
+  .pick { display: grid; grid-template-columns: 1fr auto auto auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .pick button { padding: 3px 9px; font-size: 12px; }
+  .pick button.sel { background: var(--accent); color: #111; border-color: var(--accent); }
+  .hint { color: var(--muted); font-size: 12px; }
+  .pill-ai { color: var(--ai); }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">12th<span>Man</span></div>
+  <div class="tag">Your AI co-pilot for live fantasy matches. It tells you what each ball means for <i>your</i> team.</div>
+  <div class="spacer"></div>
+  <span id="aiBadge" class="badge">AI: checking…</span>
+  <button id="langBtn" title="Reply language">EN</button>
+  <button id="rulesBtn">Points system</button>
+</header>
+
+<main>
+  <section class="col-left">
+    <div class="card">
+      <h3><span class="live-dot"></span> Live match · T20 (simulated replay)</h3>
+      <div id="scoreboard"></div>
+      <div class="controls">
+        <button id="playBtn" class="primary">▶ Play</button>
+        <button data-speed="1">1x</button><button data-speed="4">4x</button><button data-speed="15">15x</button>
+        <button id="overBtn">Next over ⏭</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>My XI <span class="sub" id="myTotalSmall"></span></h3>
+      <div id="myxi"></div>
+    </div>
+  </section>
+
+  <section class="col-feed">
+    <div class="card">
+      <h3>What just happened, for you</h3>
+      <div id="awayZone"></div>
+      <div class="feed" id="feed"></div>
+    </div>
+  </section>
+
+  <section class="col-right">
+    <div class="card">
+      <h3>My free contest · 3,001 teams</h3>
+      <div class="kpis">
+        <div class="kpi"><div class="l">My points</div><div class="big" id="myPts">0</div><div class="sub" id="ptsVs"></div></div>
+        <div class="kpi"><div class="l">Rank</div><div class="big" id="myRank">–</div><div class="sub" id="rankDelta"></div></div>
+      </div>
+      <svg class="spark" id="spark" viewBox="0 0 300 56" preserveAspectRatio="none"></svg>
+      <div class="sub">Rank over the match (higher on the chart = better rank)</div>
+    </div>
+
+    <div class="card">
+      <h3>Who to cheer for right now</h3>
+      <div class="two">
+        <div><div class="sub" style="color:var(--up)">▲ Cheer: you gain on the field</div><div id="cheer"></div></div>
+        <div><div class="sub" style="color:var(--down)">▼ Danger: the field gains on you</div><div id="danger"></div></div>
+      </div>
+      <div class="hint" style="margin-top:8px">The number is your stake in that player's points minus the average rival's.
+        +1.2x means each point he scores is worth 1.2 points <i>more</i> to you than to the field.</div>
+    </div>
+
+    <div class="card">
+      <h3><span class="pill-ai">✦</span> Ask 12th Man</h3>
+      <div class="controls" style="margin:0 0 10px">
+        <button id="awayBtn">🚶 Step away</button>
+        <button id="catchBtn">⚡ Catch me up</button>
+      </div>
+      <div class="chat" id="chat"></div>
+      <div class="sugg" id="sugg"></div>
+      <form class="ask" id="askForm"><input id="askInput" placeholder="e.g. Why did my rank drop?" autocomplete="off"><button class="primary">Ask</button></form>
+    </div>
+  </section>
+</main>
+
+<div class="overlay" id="prematch">
+  <div class="modal">
+    <h2>Your team is locked. Pick your Captain and VC.</h2>
+    <div class="hint" style="margin-bottom:12px">MUM vs BLR · Free contest with 3,000 rival teams (simulated from realistic ownership). The Captain earns 2x points, the VC earns 1.5x. "Owned" is the % of rivals who picked that player.</div>
+    <div id="pickList"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px;flex-wrap:wrap">
+      <span class="hint" id="pickHint"></span>
+      <button class="primary" id="startBtn">Start the match ▶</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="rules" style="display:none">
+  <div class="modal">
+    <h2>Points system</h2>
+    <div class="hint" style="margin-bottom:10px">A simplified Dream11-style T20 system, used for this prototype.</div>
+    <div id="rulesList"></div>
+    <div style="text-align:right;margin-top:12px"><button onclick="document.getElementById('rules').style.display='none'">Close</button></div>
+  </div>
+</div>
+
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

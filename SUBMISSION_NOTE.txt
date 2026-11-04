@@ -1,0 +1,7 @@
+12th Man: an AI co-pilot for live fantasy matches
+
+Fan problem: After the toss, a fan's Dream11 team is locked; for 3+ hours they can only watch. The app shows points and rank, not meaning. Fans ask: "My rank dropped but I didn't lose points, why?", "Is this wicket good or bad for me?", "Who should I cheer for?", "I missed 4 overs, what happened?" Rank depends on how your team compares with everyone else's, and nobody explains that.
+
+How it helps: 12th Man turns every ball into "what this means for you": your points change vs the average rival, and how many rank spots you moved. A Cheer/Danger board shows whose runs help or hurt you, even players you don't own. "Step away, then Catch me up" gives a personal recap, and an Ask-anything chat answers in English or Hinglish. It keeps fans engaged in-app during the match, which fits Dream11's free, engagement-first model. Code calculates all numbers; the AI only explains them, so it cannot invent scores.
+
+AI tools used: Claude Code (Anthropic) to research, build and test the prototype; the Claude API (Claude Opus) inside the app for explanations and chat, with a rule-based offline fallback.
