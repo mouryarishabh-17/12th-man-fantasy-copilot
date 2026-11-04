@@ -1,3 +1,6 @@
+Live app (opens in any browser, no login): https://mouryarishabh-17.github.io/12th-man-fantasy-copilot/
+Code: https://github.com/mouryarishabh-17/12th-man-fantasy-copilot
+
 12th Man: an AI co-pilot for live fantasy matches
 
 Fan problem: After the toss, a fan's Dream11 team is locked; for 3+ hours they can only watch. The app shows points and rank, not meaning. Fans ask: "My rank dropped but I didn't lose points, why?", "Is this wicket good or bad for me?", "Who should I cheer for?", "I missed 4 overs, what happened?" Rank depends on how your team compares with everyone else's, and nobody explains that.

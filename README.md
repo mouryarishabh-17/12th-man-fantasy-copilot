@@ -1,5 +1,7 @@
 # 12th Man: your AI co-pilot for live fantasy matches
 
+**Live demo:** https://mouryarishabh-17.github.io/12th-man-fantasy-copilot/
+
 **Quick open:** double-click `web/index.html` (works in any browser, no install, offline AI mode).
 For the Claude-powered answers, see "Run it" below.
 
